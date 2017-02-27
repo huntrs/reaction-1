@@ -68,7 +68,6 @@ function getTaxSettings() {
  * @returns {Object} Response from call
  */
 function avaGet(requestUrl, options = {}) {
-  let result;
   const logObject = {};
   const pkgData = taxCalc.getPackageData();
   const appVersion = Reaction.getAppVersion();
@@ -131,9 +130,19 @@ function avaPost(requestUrl, options) {
   if (pkgData.settings.avalara.enableLogging) {
     logObject.request = allOptions;
   }
-  const result = HTTP.post(requestUrl, allOptions);
+
+  let result;
+
+  try {
+    result = HTTP.post(requestUrl, allOptions);
+  } catch (error) {
+    Logger.error(`Encountered error while calling API at ${requestUrl}`);
+    Logger.error(error);
+    result = {};
+  }
+
   if (pkgData.settings.avalara.enableLogging) {
-    logObject.duration = result.headers.serverDuration;
+    logObject.duration = _.get(result, "headers.serverDuration");
     logObject.result = result.data;
     Avalogger.info(logObject);
   }
@@ -187,7 +196,7 @@ taxCalc.validateAddress = function (address) {
   }
 
   let messages;
-  let validatedAddress;
+  let validatedAddress = ""; // set default as falsy value
   const errors = [];
   const addressToValidate  = {
     line1: address.address1,
@@ -206,7 +215,13 @@ taxCalc.validateAddress = function (address) {
   const baseUrl = getUrl();
   const requestUrl = `${baseUrl}/addresses/resolve`;
   const result = avaPost(requestUrl, { data: addressToValidate });
-  const content = JSON.parse(result.content);
+  let content;
+
+  try {
+    content = JSON.parse(result.content);
+  } catch (error) {
+    content = result.content;
+  }
   if (content.messages) {
     messages = content.messages;
   }
