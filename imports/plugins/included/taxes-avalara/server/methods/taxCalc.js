@@ -68,6 +68,7 @@ function getTaxSettings() {
  * @returns {Object} Response from call
  */
 function avaGet(requestUrl, options = {}) {
+  let result;
   const logObject = {};
   const pkgData = taxCalc.getPackageData();
   const appVersion = Reaction.getAppVersion();
@@ -86,9 +87,17 @@ function avaGet(requestUrl, options = {}) {
   if (pkgData.settings.avalara.enableLogging) {
     logObject.request = allOptions;
   }
-  const result = HTTP.get(requestUrl, allOptions);
+
+  try {
+    result = HTTP.get(requestUrl, allOptions);
+  } catch (error) {
+    result = error;
+    Logger.error(`Encountered error while calling Avalara API endpoint ${requestUrl}`);
+    Logger.error(error);
+  }
+
   if (pkgData.settings.avalara.enableLogging) {
-    logObject.duration = result.headers.serverDuration;
+    logObject.duration = _.get(result, "headers.serverDuration");
     logObject.result = result.data;
     Avalogger.info(logObject);
   }
