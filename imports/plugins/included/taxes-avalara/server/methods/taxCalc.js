@@ -143,13 +143,13 @@ function avaPost(requestUrl, options) {
 
 /**
  * @summary Gets the full list of Avalara-supported entity use codes.
- * @returns {Object} API response
+ * @returns {Object[]} API response
  */
 taxCalc.getEntityCodes = function () {
   const baseUrl = getUrl();
   const requestUrl = `${baseUrl}definitions/entityusecodes`;
   const result = avaGet(requestUrl);
-  return _.get(result, "data.value");
+  return _.get(result, "data.value", []);
 };
 
 // API Methods
@@ -255,7 +255,7 @@ taxCalc.getTaxCodes = function () {
   const baseUrl = getUrl();
   const requestUrl = `${baseUrl}definitions/taxcodes`;
   const result = avaGet(requestUrl);
-  return result.data.value;
+  return _.get(result, "data.value", []);
 };
 
 /**
