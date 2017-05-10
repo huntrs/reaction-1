@@ -1,5 +1,4 @@
 import url from "url";
-import packageJson from "/package.json";
 import { merge, uniqWith } from "lodash";
 import { Meteor } from "meteor/meteor";
 import { EJSON } from "meteor/ejson";
@@ -10,7 +9,6 @@ import { getRegistryDomain } from "./setDomain";
 import { registerTemplate } from "./templates";
 import { sendVerificationEmail } from "./accounts";
 import { getMailUrl } from "./email/config";
-
 
 export default {
 
@@ -30,11 +28,8 @@ export default {
     this.loadPackages();
     // process imports from packages and any hooked imports
     this.Import.flush();
-    // timing is important, packages are rqd for initial permissions configuration.
-    if (!Meteor.isAppTest) {
-      this.createDefaultAdminUser();
-    }
-    this.setAppVersion();
+    // timing is important, packages are rqd for initilial permissions configuration.
+    this.createDefaultAdminUser();
     // hook after init finished
     Hooks.Events.run("afterCoreInit");
 
@@ -208,31 +203,8 @@ export default {
     return settings.settings || {};
   },
 
-  getShopCurrency() {
-    const shop = Shops.findOne({
-      _id: this.getShopId()
-    });
-
-    return shop && shop.currency || "USD";
-  },
-
-  getShopLanguage() {
-    const { language } = Shops.findOne({
-      _id: this.getShopId()
-    }, {
-      fields: {
-        language: 1
-      } }
-    );
-    return language;
-  },
-
   getPackageSettings(name) {
     return Packages.findOne({ packageName: name, shopId: this.getShopId() }) || null;
-  },
-
-  getAppVersion() {
-    return Shops.findOne().appVersion;
   },
 
   /**
@@ -258,7 +230,7 @@ export default {
     const shopId = this.getShopId();
 
     // if an admin user has already been created, we'll exit
-    if (Roles.getUsersInRole("owner", shopId).count() !== 0) {
+    if (Roles.getUsersInRole(defaultAdminRoles, shopId).count() !== 0) {
       Logger.debug("Not creating default admin user, already exists");
       return ""; // this default admin has already been created for this shop.
     }
@@ -375,33 +347,22 @@ export default {
   loadPackages() {
     const packages = Packages.find().fetch();
 
-    let registryFixtureData;
+    let settingsFromJSON;
 
-    if (process.env.REACTION_REGISTRY) {
-      // check the environment for the registry fixture data first
-      registryFixtureData = process.env.REACTION_REGISTRY;
-      Logger.info("Loaded REACTION_REGISTRY environment variable for registry fixture import");
-    } else {
-      // or attempt to load reaction.json fixture data
-      try {
-        registryFixtureData = Assets.getText("settings/reaction.json");
-      } catch (error) {
-        Logger.warn("Skipped loading settings from reaction.json.");
-        Logger.debug(error, "loadSettings reaction.json not loaded.");
-      }
-      Logger.info("Loaded \"/private/settings/reaction.json\" for registry fixture import");
-    }
+    // Attempt to load reaction.json fixture data
+    try {
+      const settingsJSONAsset = Assets.getText("settings/reaction.json");
+      const validatedJson = EJSON.parse(settingsJSONAsset);
 
-    if (!!registryFixtureData) {
-      const validatedJson = EJSON.parse(registryFixtureData);
-
-      if (!Array.isArray(validatedJson[0])) {
-        Logger.warn("Registry fixture data is not an array. Failed to load.");
+      if (!_.isArray(validatedJson[0])) {
+        Logger.warn("Load Settings is not an array. Failed to load settings.");
       } else {
-        registryFixtureData = validatedJson;
+        settingsFromJSON = validatedJson;
       }
+    } catch (error) {
+      Logger.warn("Skipped loading settings from reaction.json.");
+      Logger.debug(error, "loadSettings reaction.json not loaded.");
     }
-
     const layouts = [];
     // for each shop, we're loading packages in a unique registry
     _.each(this.Packages, (config, pkgName) => {
@@ -424,8 +385,8 @@ export default {
 
         // Setting from a fixture file, most likely reaction.json
         let settingsFromFixture;
-        if (registryFixtureData) {
-          settingsFromFixture = _.find(registryFixtureData[0], (packageSetting) => {
+        if (settingsFromJSON) {
+          settingsFromFixture = _.find(settingsFromJSON[0], (packageSetting) => {
             return config.name === packageSetting.name;
           });
         }
@@ -472,10 +433,5 @@ export default {
         return false;
       });
     });
-  },
-  setAppVersion() {
-    const version = packageJson.version;
-    Logger.info(`Reaction Version: ${version}`);
-    Shops.update({}, { $set: { appVersion: version } }, { multi: true });
   }
 };

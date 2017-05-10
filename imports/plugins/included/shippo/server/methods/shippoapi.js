@@ -62,30 +62,16 @@ ShippoApi.methods.getCarrierAccountsList = new ValidatedMethod({
   }).validator(),
   run({ apiKey }) {
     const shippoObj = new Shippo(apiKey);
-    let allCarriers = [];
 
-    // recursively fetch carriers because shippo returns paginated results
-    function fetchCarriers() {
-      try {
-        const response = Meteor.wrapAsync(shippoObj.carrieraccount.list, shippoObj.carrieraccount)();
-        allCarriers = allCarriers.concat(response.results);
+    const getCarrierAccountsListFiber = Meteor.wrapAsync(shippoObj.carrieraccount.list, shippoObj.carrieraccount);
+    try {
+      const carrierAccountList = getCarrierAccountsListFiber();
 
-        if (!response.next) {
-          response.results = allCarriers;
-          return response;
-        }
-        // the Shippo module uses "createFullPath" to form the url for the request
-        // https://github.com/goshippo/shippo-node-client/blob/master/lib/Resource.js#L40-L48
-        // hence we're passing the next url in this way
-        shippoObj.carrieraccount.createFullPath = () => response.next;
-        return fetchCarriers();
-      } catch (error) {
-        Logger.error(error.message);
-        throw new Meteor.Error(error.message);
-      }
+      return carrierAccountList;
+    } catch (error) {
+      Logger.error(error.message);
+      throw new Meteor.Error(error.message);
     }
-
-    return fetchCarriers();
   }
 });
 

@@ -14,42 +14,17 @@ export const methods = {
    * @return { Number } insert result
    */
   "shipping/rates/add": function (rate) {
-    check(rate, {
-      _id: Match.Optional(String),
-      name: String,
-      label: String,
-      group: String,
-      cost: Match.Optional(Number),
-      handling: Match.Optional(Number),
-      rate: Number,
-      enabled: Boolean
-    });
-    if (!Reaction.hasPermission(shippingRoles)) {
-      throw new Meteor.Error(403, "Access Denied");
-    }
+    check(rate, ShippingMethod);
     // a little trickery
     // we passed in the providerId
     // as _id, perhaps cleanup
-    let providerId;
-    if (rate._id) {
-      providerId = rate._id;
-    } else {
-      // There is no default provider, so add it
-      if (!Shipping.find({}).count()) {
-        const defaultProvider = Shipping.insert({
-          name: "Default Shipping Provider",
-          provider: {
-            name: "flatRates",
-            label: "Flat Rate"
-          }
-        });
-        providerId = defaultProvider;
-      } else {
-        throw new Meteor.Error("bad-provider-id", "No Provider ID provided when adding methods");
-      }
+    const providerId = rate._id;
+    rate._id = Random.id();
+
+    if (!Reaction.hasPermission(shippingRoles)) {
+      throw new Meteor.Error(403, "Access Denied");
     }
 
-    rate._id = Random.id();
     return Shipping.update({
       _id: providerId
     }, {

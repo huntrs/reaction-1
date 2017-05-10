@@ -8,10 +8,6 @@
           "productSettingsLabel": "Setări produs",
           "productDetailsLabel": "Detalii produs"
         }
-      },
-      "productDetailEdit": {
-        "template": "Setări șablon",
-        "templateSelectPlaceholder": "Selectați un șablon"
       }
     }
   }

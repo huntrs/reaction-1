@@ -10,20 +10,7 @@
           "smsDescription": "Értesítések"
         },
         "settings": {
-          "smsSettingsLabel": "SMS-beállítások",
-          "smsProvider": "SMS Szolgáltató",
-          "providerName": "szolgáltató neve",
-          "selectProvider": "Válasszon egy SMS-szolgáltató",
-          "phoneNumber": "SMS telefonszám",
-          "apiKey": "API-kulcs",
-          "apiToken": "API Token / Secret"
-        },
-        "alerts": {
-          "noApiKey": "Kérjük, adjon hozzá egy API-kulcs",
-          "noApiToken": "Kérjük, add egy API TOKEN / Secret",
-          "noSmsProvider": "Kérjük, válasszon egy SMS-szolgáltató",
-          "noSmsPhone": "Kérjük, adja hozzá a telefonszámot adott meg az SMS-szolgáltató",
-          "saveSuccess": "SMS-beállítások mentve"
+          "smsSettingsLabel": "SMS-beállítások"
         }
       }
     }

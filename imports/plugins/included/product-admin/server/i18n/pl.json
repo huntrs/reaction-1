@@ -8,10 +8,6 @@
           "productSettingsLabel": "Ustawienia produktu",
           "productDetailsLabel": "Szczegóły Produktu"
         }
-      },
-      "productDetailEdit": {
-        "template": "Ustawienia szablonu",
-        "templateSelectPlaceholder": "Wybierz szablon"
       }
     }
   }

@@ -3,10 +3,6 @@ import { ReactionProduct } from "/lib/api";
 import { Media } from "/lib/collections";
 import { Icon } from "/imports/plugins/core/ui/client/components";
 
-function productHandle() {
-  const selectedProduct = ReactionProduct.selectedProduct();
-  return selectedProduct.__published && selectedProduct.__published.handle || selectedProduct.handle;
-}
 /**
  * childVariantForm onRendered
  */
@@ -94,10 +90,11 @@ Template.childVariantForm.helpers({
 
 Template.childVariantForm.events({
   "click .child-variant-form :input, click li": function (event, template) {
+    const selectedProduct = ReactionProduct.selectedProduct();
     const variantId = template.data._id;
 
     Reaction.Router.go("product", {
-      handle: productHandle(),
+      handle: selectedProduct.handle,
       variantId: variantId
     });
 
@@ -117,10 +114,11 @@ Template.childVariantForm.events({
     return ReactionProduct.setCurrentVariant(variant._id);
   },
   "click .js-child-variant-heading": function (event, instance) {
+    const selectedProduct = ReactionProduct.selectedProduct();
     const variantId = instance.data._id;
 
     Reaction.Router.go("product", {
-      handle: productHandle(),
+      handle: selectedProduct.handle,
       variantId: variantId
     });
   },

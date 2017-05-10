@@ -1,29 +1,9 @@
 import React, { Component, PropTypes } from "react";
-import { TextField, Translation } from "/imports/plugins/core/ui/client/components";
+import { FieldGroup, Translation } from "/imports/plugins/core/ui/client/components";
 
 class ExampleSettingsForm extends Component {
-  constructor(props) {
-    super(props);
-
-    this.state = {
-      settings: {
-        apiKey: ""
-      }
-    };
-
-    this.handleStateChange = this.handleStateChange.bind(this);
-  }
-
-  handleStateChange(e) {
-    const { settings } = this.state;
-    settings[e.target.name] = e.target.value;
-    this.setState({ settings });
-  }
-
-
   render() {
     const { packageData } = this.props;
-    const { settings } = this.state;
 
     return (
       <div>
@@ -34,12 +14,11 @@ class ExampleSettingsForm extends Component {
         }
 
         <form onSubmit={this.props.onSubmit}>
-          <TextField
+          <FieldGroup
             label="API Key"
             name="apiKey"
             type="text"
-            onChange={this.handleStateChange}
-            value={settings.apiKey}
+            onChange={this.props.onChange}
           />
 
           <button className="btn btn-primary pull-right" type="submit">
@@ -59,3 +38,4 @@ ExampleSettingsForm.propTypes = {
 };
 
 export default ExampleSettingsForm;
+

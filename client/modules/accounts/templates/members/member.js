@@ -1,4 +1,3 @@
-import _ from "lodash";
 import { Reaction } from "/client/api";
 import { Packages, Shops } from "/lib/collections";
 import { Meteor } from "meteor/meteor";
@@ -20,8 +19,6 @@ const getPermissionMap = (permissions) => {
  */
 Template.member.events({
   "click [data-event-action=showMemberSettings]": function () {
-    $(".customerUsageType input").val(""); // form reset
-    $(".customerUsageType").addClass("hide"); // form reset
     Reaction.setActionViewDetail({
       label: "Permissions",
       i18nKeyLabel: "admin.settings.permissionsSettingsLabel",
@@ -38,9 +35,6 @@ Template.memberSettings.helpers({
         return true;
       }
     }
-  },
-  userId: function () {
-    return Meteor.userId();
   },
   hasPermissionChecked: function (permission, userId) {
     if (userId && Roles.userIsInRole(userId, permission, this.shopId || Roles.userIsInRole(userId, permission,
@@ -116,18 +110,6 @@ Template.memberSettings.helpers({
 
   hasManyPermissions: function (permissions) {
     return Boolean(permissions.length);
-  },
-  /**
-   * showAvalaraTaxSettings
-   * @return {Boolean} True if avalara is enabled. Defaults to false if not found
-   */
-  showAvalaraTaxSettings() {
-    const avalara = Packages.findOne({
-      name: "taxes-avalara",
-      shopId: Reaction.getShopId()
-    });
-
-    return _.get(avalara, "settings.avalara.enabled", false);
   }
 });
 

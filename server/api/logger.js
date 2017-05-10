@@ -9,7 +9,6 @@ const levels = ["FATAL", "ERROR", "WARN", "INFO", "DEBUG", "TRACE"];
 
 // set stdout log level
 let level = process.env.REACTION_LOG_LEVEL || Meteor.settings.REACTION_LOG_LEVEL || "INFO";
-let outputMode = "short";
 
 level = level.toUpperCase();
 
@@ -17,14 +16,10 @@ if (!includes(levels, level)) {
   level = "INFO";
 }
 
-if (level === "TRACE") {
-  outputMode = "json";
-}
-
 // default console config (stdout)
 const streams = [{
   level,
-  stream: bunyanFormat({ outputMode })
+  stream: bunyanFormat({ outputMode: "short" })
 }];
 
 // Loggly config (only used if configured)

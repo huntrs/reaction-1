@@ -10,20 +10,7 @@
           "smsDescription": "Oznámení"
         },
         "settings": {
-          "smsSettingsLabel": "nastavení SMS",
-          "smsProvider": "SMS Provider",
-          "providerName": "Jméno dodavatele",
-          "selectProvider": "Vyberte poskytovatele SMS",
-          "phoneNumber": "SMS telefonní číslo",
-          "apiKey": "klíč API",
-          "apiToken": "API Token / Secret"
-        },
-        "alerts": {
-          "noApiKey": "Prosím, přidejte klíč API",
-          "noApiToken": "Prosím, přidejte API TOKENU / Secret",
-          "noSmsProvider": "Vyberte poskytovatele SMS",
-          "noSmsPhone": "Prosím, přidejte telefonní číslo, které jste dostali od svého poskytovatele SMS",
-          "saveSuccess": "Nastavení SMS uloženo"
+          "smsSettingsLabel": "nastavení SMS"
         }
       }
     }

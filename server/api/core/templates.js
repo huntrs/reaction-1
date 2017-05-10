@@ -112,8 +112,7 @@ export function processTemplateInfoForDatabase(templateInfo) {
     name: templateInfo.name,
     title: templateInfo.title,
     type: templateInfo.type,
-    subject: templateInfo.subject,
-    templateFor: templateInfo.templateFor
+    subject: templateInfo.subject
   };
 
 

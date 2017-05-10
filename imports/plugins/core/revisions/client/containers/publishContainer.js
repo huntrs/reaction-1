@@ -23,16 +23,12 @@ class PublishContainer extends Component {
       const documentIdsSet = new Set(documentIds); // ensures they are unique
       documentIds = Array.from(documentIdsSet);
       Meteor.call("revisions/publish", documentIds, (error, result) => {
-        if (result && result.status === "success") {
+        if (result === true) {
           const message = i18next.t("revisions.changedPublished", {
             defaultValue: "Changes published successfully"
           });
 
           Alerts.toast(message, "success");
-
-          if (this.props.onPublishSuccess) {
-            this.props.onPublishSuccess(result);
-          }
         } else {
           const message = i18next.t("revisions.noChangesPublished", {
             defaultValue: "There are no changes to publish"
@@ -96,7 +92,6 @@ PublishContainer.propTypes = {
   isEnabled: PropTypes.bool,
   isPreview: PropTypes.bool,
   onAction: PropTypes.func,
-  onPublishSuccess: PropTypes.func,
   onVisibilityChange: PropTypes.func,
   revisions: PropTypes.arrayOf(PropTypes.object)
 };

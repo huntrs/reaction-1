@@ -8,10 +8,6 @@
           "productSettingsLabel": "Ürün Ayarları",
           "productDetailsLabel": "Ürün Detayları"
         }
-      },
-      "productDetailEdit": {
-        "template": "şablon Ayarları",
-        "templateSelectPlaceholder": "Bir şablon seçin"
       }
     }
   }

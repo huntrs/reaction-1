@@ -24,8 +24,10 @@ Template.registerHelper("i18n", function (i18nKey, i18nMessage) {
 
   i18nextDep.depend();
 
+  const message = new Spacebars.SafeString(i18nMessage);
+
   // returning translated key
-  return i18next.t(i18nKey, { defaultValue: i18nMessage });
+  return i18next.t(i18nKey, { defaultValue: message });
 });
 
 /**
