@@ -5,12 +5,8 @@ import { Template } from "meteor/templating";
 import { ReactiveVar } from "meteor/reactive-var";
 import { i18next, Logger, formatNumber, Reaction } from "/client/api";
 import { NumericInput } from "/imports/plugins/core/ui/client/components";
-import { Orders, Shops } from "/lib/collections";
+import { Media, Orders, Shops } from "/lib/collections";
 import DiscountList from "/imports/plugins/core/discounts/client/components/list";
-import InvoiceContainer from "../../containers/invoiceContainer.js";
-import LineItemsContainer from "../../containers/lineItemsContainer.js";
-import TotalActionsContainer from "../../containers/totalActionsContainer.js";
-
 
 // helper to return the order payment object
 // the first credit paymentMethod on the order
@@ -26,11 +22,6 @@ Template.coreOrderShippingInvoice.onCreated(function () {
   this.state = new ReactiveDict();
   this.refunds = new ReactiveVar([]);
   this.refundAmount = new ReactiveVar(0.00);
-  this.state.setDefault({
-    isCapturing: false,
-    isRefunding: false,
-    isFetching: true
-  });
 
   this.autorun(() => {
     const currentData = Template.currentData();
@@ -44,7 +35,6 @@ Template.coreOrderShippingInvoice.onCreated(function () {
       Meteor.call("orders/refunds/list", order, (error, result) => {
         if (!error) {
           this.refunds.set(result);
-          this.state.set("isFetching", false);
         }
       });
     }
@@ -52,41 +42,8 @@ Template.coreOrderShippingInvoice.onCreated(function () {
 });
 
 Template.coreOrderShippingInvoice.helpers({
-  isCapturing() {
-    const instance = Template.instance();
-    if (instance.state.get("isCapturing")) {
-      instance.$(":input").attr("disabled", true);
-      instance.$("#btn-capture-payment").text("Capturing");
-      return true;
-    }
-    return false;
-  },
-  isRefunding() {
-    const instance = Template.instance();
-    if (instance.state.get("isRefunding")) {
-      instance.$("#btn-refund-payment").text("Refunding");
-      return true;
-    }
-    return false;
-  },
-  isFetching() {
-    const instance = Template.instance();
-    if (instance.state.get("isFetching")) {
-      return true;
-    }
-    return false;
-  },
   DiscountList() {
     return DiscountList;
-  },
-  InvoiceContainer() {
-    return InvoiceContainer;
-  },
-  LineItemsContainer() {
-    return LineItemsContainer;
-  },
-  TotalActionsContainer() {
-    return TotalActionsContainer;
   },
   orderId() {
     const instance = Template.instance();
@@ -163,7 +120,7 @@ Template.coreOrderShippingInvoice.events({
    * @param  {Template} instance - Blaze Template
    * @return {void}
    */
-  "click [data-event-action=applyRefund]": (event, instance) => {
+  "submit form[name=refund]": (event, instance) => {
     event.preventDefault();
 
     const { state } = Template.instance();
@@ -202,14 +159,12 @@ Template.coreOrderShippingInvoice.events({
         confirmButtonText: i18next.t("order.applyRefund")
       }, (isConfirm) => {
         if (isConfirm) {
-          state.set("isRefunding", true);
           Meteor.call("orders/refunds/create", order._id, paymentMethod, refund, (error) => {
             if (error) {
               Alerts.alert(error.reason);
             }
             Alerts.toast(i18next.t("mail.alerts.emailSent"), "success");
             state.set("field-refund", 0);
-            state.set("isRefunding", false);
           });
         }
       });
@@ -223,9 +178,6 @@ Template.coreOrderShippingInvoice.events({
 
   "click [data-event-action=capturePayment]": (event, instance) => {
     event.preventDefault();
-
-    instance.state.set("isCapturing", true);
-
     const order = instance.state.get("order");
     Meteor.call("orders/capturePayments", order._id);
 
@@ -309,15 +261,15 @@ Template.coreOrderShippingInvoice.helpers({
   refundAmount() {
     return Template.instance().refundAmount;
   },
-
+  /**
+   * Discount
+   * @return {Number} current discount amount
+   */
   invoice() {
     const instance = Template.instance();
     const order = instance.state.get("order");
 
-    const invoice = Object.assign({}, order.billing[0].invoice, {
-      totalItems: _.sumBy(order.items, (o) => o.quantity)
-    });
-    return invoice;
+    return order.billing[0].invoice;
   },
 
   money(amount) {
@@ -381,6 +333,7 @@ Template.coreOrderShippingInvoice.helpers({
 
   refunds() {
     const refunds = Template.instance().refunds.get();
+
     if (_.isArray(refunds)) {
       return refunds.reverse();
     }
@@ -410,18 +363,9 @@ Template.coreOrderShippingInvoice.helpers({
     return Math.abs(paymentMethod.amount - refundTotal);
   },
 
-  capturedDisabled() {
-    const isLoading = Template.instance().state.get("isCapturing");
-    if (isLoading) {
-      return "disabled";
-    }
-    return null;
-  },
-
   refundSubmitDisabled() {
     const amount = Template.instance().state.get("field-refund") || 0;
-    const isLoading = Template.instance().state.get("isRefunding");
-    if (amount === 0 || isLoading) {
+    if (amount === 0) {
       return "disabled";
     }
 
@@ -450,53 +394,43 @@ Template.coreOrderShippingInvoice.helpers({
     return shipment;
   },
 
-  discounts() {
-    const enabledPaymentsArr = [];
-    const apps = Reaction.Apps({
-      provides: "paymentMethod",
-      enabled: true
-    });
-    for (app of apps) {
-      if (app.enabled === true) enabledPaymentsArr.push(app);
-    }
-    let discount = false;
-
-    for (enabled of enabledPaymentsArr) {
-      if (enabled.packageName === "discount-codes") {
-        discount = true;
-        break;
-      }
-    }
-    return discount;
-  },
-
   items() {
     const instance = Template.instance();
     const order = instance.state.get("order");
     const currentData = Template.currentData();
     const shipment = currentData.fulfillment;
 
-    // returns order items with shipping detail
-    const returnItems = _.map(order.items, (item) => {
-      const shipping = shipment.shipmentMethod;
-      return _.extend(item, { shipping });
+    const items = _.map(shipment.items, (item) => {
+      const originalItem = _.find(order.items, {
+        _id: item._id
+      });
+      return _.extend(originalItem, item);
     });
 
-    let items;
-
-    // if avalara tax has been enabled it adds a "taxDetail" field for every item
-    if (order.taxes !== undefined) {
-      const taxes = order.taxes.slice(0, -1);
-
-      items = _.map(returnItems, (item) => {
-        const taxDetail = _.find(taxes, {
-          lineNumber: item._id
-        });
-        return _.extend(item, { taxDetail });
-      });
-    } else {
-      items = returnItems;
-    }
     return items;
+  },
+
+  /**
+   * Media - find meda based on a variant
+   * @param  {String|Object} variantObjectOrId A variant of a product or a variant Id
+   * @return {Object|false}    An object contianing the media or false
+   */
+  media(variantObjectOrId) {
+    let variantId = variantObjectOrId;
+
+    if (typeof variant === "object") {
+      variantId = variantObjectOrId._id;
+    }
+
+    const defaultImage = Media.findOne({
+      "metadata.variantId": variantId,
+      "metadata.priority": 0
+    });
+
+    if (defaultImage) {
+      return defaultImage;
+    }
+
+    return false;
   }
 });

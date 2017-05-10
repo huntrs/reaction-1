@@ -8,10 +8,6 @@
           "productSettingsLabel": "Product Settings",
           "productDetailsLabel": "Product Details"
         }
-      },
-      "productDetailEdit": {
-        "template": "Template",
-        "templateSelectPlaceholder": "Select a template"
       }
     }
   }

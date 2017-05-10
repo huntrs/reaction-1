@@ -1,7 +1,7 @@
 import { Meteor } from "meteor/meteor";
 import { Job } from "meteor/vsivsi:job-collection";
 import { Jobs, Templates } from "/lib/collections";
-import { Reaction, Logger } from "/server/api";
+import { Logger } from "/server/api";
 
 
 /**
@@ -33,7 +33,14 @@ export function getSubject(template) {
   }
 
   // set default
-  const language = Reaction.getShopLanguage();
+  let language = "en";
+
+  const shopLocale = Meteor.call("shop/getLocale");
+
+  // set the language if found
+  if (shopLocale && shopLocale.locale && shopLocale.locale.languages) {
+    language = shopLocale.locale.languages;
+  }
 
   // check database for a matching template
   const tmpl = Templates.findOne({
@@ -45,6 +52,8 @@ export function getSubject(template) {
   if (tmpl && tmpl.template) {
     return tmpl.subject;
   }
+
+  // otherwise, use the default template from the filesystem
   return "A message from {{shop.name}}";
 }
 
@@ -62,7 +71,14 @@ export function getTemplate(template) {
   }
 
   // set default
-  const language = Reaction.getShopLanguage();
+  let language = "en";
+
+  const shopLocale = Meteor.call("shop/getLocale");
+
+  // set the language if found
+  if (shopLocale && shopLocale.locale && shopLocale.locale.languages) {
+    language = shopLocale.locale.languages;
+  }
 
   // check database for a matching template
   const tmpl = Templates.findOne({

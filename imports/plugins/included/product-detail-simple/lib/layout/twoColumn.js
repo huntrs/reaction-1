@@ -3,7 +3,7 @@ export default function twoColumn() {
   return [
     // Media block
     // Contains
-    // - Media Gallery
+    // - Medai Gallery
     // - Tags
     // - Details
     {
@@ -30,23 +30,11 @@ export default function twoColumn() {
       ]
     },
 
-    // Product Details Block
-    // Contains
-    // - Title
-    // - Subtitle
-    // - Price
-    // - Social
-    // - Vendor
-    // - Description
-    // - Variants
-    // - Add to Cart button
+    // Variant block
     {
       type: "block",
       columns: 6,
       size: "half",
-      style: {
-        display: "block"
-      },
       permissions: ["admin"],
       audience: ["guest", "anonymous"],
       children: [

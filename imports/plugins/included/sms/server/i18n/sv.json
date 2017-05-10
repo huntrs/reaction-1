@@ -10,20 +10,7 @@
           "smsDescription": "Meddelanden"
         },
         "settings": {
-          "smsSettingsLabel": "SMS-inställningar",
-          "smsProvider": "SMS Provider",
-          "providerName": "provider Namn",
-          "selectProvider": "Välj en SMS-leverantör",
-          "phoneNumber": "SMS Telefonnummer",
-          "apiKey": "API-nyckel",
-          "apiToken": "API-token / Secret"
-        },
-        "alerts": {
-          "noApiKey": "Lägg till en API-nyckel",
-          "noApiToken": "Lägg till en API-token / Secret",
-          "noSmsProvider": "Välj ett SMS-leverantör",
-          "noSmsPhone": "Vänligen lägga till telefonnumret som du fått från din SMS-leverantör",
-          "saveSuccess": "SMS-inställningar sparas"
+          "smsSettingsLabel": "SMS-inställningar"
         }
       }
     }

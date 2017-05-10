@@ -8,10 +8,6 @@
           "productSettingsLabel": "Cài đặt sản phẩm",
           "productDetailsLabel": "Thông tin chi tiết sản phẩm"
         }
-      },
-      "productDetailEdit": {
-        "template": "Cài đặt template",
-        "templateSelectPlaceholder": "Chọn một mẫu"
       }
     }
   }

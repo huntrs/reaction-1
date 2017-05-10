@@ -28,10 +28,6 @@ class ProductField extends Component {
           { e: input, p: { backgroundColor: "#fff" }, o: { duration: 100 } }
         ]);
       });
-    } else {
-      this.setState({
-        value: nextProps.product[this.fieldName]
-      });
     }
   }
 

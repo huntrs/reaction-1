@@ -20,7 +20,7 @@ class GridProductPublishContainer extends Component {
 
   handlePublishActions = (event, action) => {
     if (action === "archive") {
-      ReactionProduct.archiveProduct(this.props.documents);
+      ReactionProduct.maybeDeleteProduct(this.props.documents);
     }
   }
 

@@ -4,32 +4,6 @@
   "ns": "taxes-avalara",
   "translation": {
     "reaction-taxes": {
-      "settings": {
-        "apiLoginId": "Avalara API Prijava ID",
-        "username": "Korisničko ime",
-        "password": "Lozinka",
-        "companyCode": "Šifra poduzeća",
-        "shippingTaxCode": "Dostava porezni broj",
-        "mode": "Proizvodnja mod",
-        "performTaxCalculation": "Izvođenje Obračun poreza",
-        "addressValidation": "Adresa valjanosti",
-        "enableAddressValidationByCountry": "Omogući Address Validation po zemljama",
-        "enableLogging": "Omogućiti upis",
-        "logRetentionDuration": "Prijava Zadržavanje Trajanje",
-        "requestTimeout": "Zatražiti pauzu",
-        "commitDocuments": "Prepusti Dokumenti",
-        "administratorsPanel": "Panel administratora",
-        "testCredentialsSuccess": "Veza Test Uspjeh",
-        "testCredentialsFailed": "Veza test nije uspio, provjerite vjerodajnice",
-        "apiError": "Avalara nije ispravno konfiguriran"
-      },
-      "logGrid": {
-        "noLogsFound": "Zapisi nisu pronađeni",
-        "columns": {
-          "date": "Rok",
-          "docType": "vrsta dokumenta"
-        }
-      },
       "admin": {
         "shortcut": {
           "avalaraLabel": "Avalara",
@@ -38,14 +12,13 @@
         "dashboard": {
           "avalaraLabel": "Avalara",
           "avalaraTitle": "Avalara",
-          "avalaraDescription": "Avalara porezne stope",
-          "testCredentials": "Test Mandatno"
+          "avalaraDescription": "Avalara porezne stope"
         },
         "taxSettings": {
           "avalaraLabel": "Avalara",
           "avalaraSettingsLabel": "Avalara",
-          "formTitle": "Porezni Postavke",
-          "entityCodeCustomLabel": "SET prilagođenu vrijednost"
+          "avalaraCredentials": "Dodaj vjerodajnice kako bi se omogućilo",
+          "avalaraGetCredentialsURL": "Dobiti ih ovdje"
         }
       }
     }

@@ -1,44 +1,6 @@
-import { Media, Products, Revisions } from "/lib/collections";
+import { Products, Revisions } from "/lib/collections";
 import { Logger, Reaction } from "/server/api";
 import { RevisionApi } from "/imports/plugins/core/revisions/lib/api/revisions";
-
-export function findProductMedia(publicationInstance, productIds) {
-  const shopId = Reaction.getShopId();
-  const selector = {};
-
-  if (!shopId) {
-    return publicationInstance.ready();
-  }
-
-  if (Array.isArray(productIds)) {
-    selector["metadata.productId"] = {
-      $in: productIds
-    };
-  } else {
-    selector["metadata.productId"] = productIds;
-  }
-
-  if (shopId) {
-    selector["metadata.shopId"] = shopId;
-  }
-
-  // No one needs to see archived images on products
-  selector["metadata.workflow"] = {
-    $nin: ["archived"]
-  };
-
-  // Product editors can see both published and unpublished images
-  if (!Reaction.hasPermission(["createProduct"], publicationInstance.userId)) {
-    selector["metadata.workflow"].$in = [null, "published"];
-  }
-
-  return Media.find(selector, {
-    sort: {
-      "metadata.priority": 1
-    }
-  });
-}
-
 
 /**
  * product detail publication
@@ -109,10 +71,7 @@ Meteor.publish("Product", function (productId) {
     };
 
     if (RevisionApi.isRevisionControlEnabled()) {
-      const productCursor = Products.find(selector);
-      const productIds = productCursor.map(p => p._id);
-
-      const handle = productCursor.observeChanges({
+      const handle = Products.find(selector).observeChanges({
         added: (id, fields) => {
           const revisions = Revisions.find({
             "documentId": id,
@@ -197,29 +156,13 @@ Meteor.publish("Product", function (productId) {
         handle2.stop();
       });
 
-      return [
-        findProductMedia(this, productIds)
-      ];
+      return this.ready();
     }
 
-    // Revision control is disabled, but is an admin
-    const productCursor = Products.find(selector);
-    const productIds = productCursor.map(p => p._id);
-    const mediaCursor = findProductMedia(this, productIds);
-
-    return [
-      productCursor,
-      mediaCursor
-    ];
+    // Revision control is disabled
+    return Products.find(selector);
   }
 
   // Everyone else gets the standard, visibile products and variants
-  const productCursor = Products.find(selector);
-  const productIds = productCursor.map(p => p._id);
-  const mediaCursor = findProductMedia(this, productIds);
-
-  return [
-    productCursor,
-    mediaCursor
-  ];
+  return Products.find(selector);
 });

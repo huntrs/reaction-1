@@ -9,7 +9,7 @@ export default class DiscountForm extends Component {
     this.state = {
       discount: this.props.discount,
       validationMessage: null,
-      validatedInput: this.props.validatedInput || false,
+      validatedInput: false,
       attempts: 0,
       discountApplied: false
     };
@@ -144,6 +144,5 @@ export default class DiscountForm extends Component {
 DiscountForm.propTypes = {
   collection: PropTypes.string,
   discount: PropTypes.string,
-  id: PropTypes.string,
-  validatedInput: PropTypes.bool
+  id: PropTypes.string
 };

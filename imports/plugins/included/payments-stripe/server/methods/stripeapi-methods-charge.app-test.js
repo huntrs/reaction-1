@@ -55,7 +55,7 @@ describe("Stripe.authorize", function () {
     sandbox.restore();
   });
 
-  it("should call StripeApi.methods.createCharge with the proper parameters and return saved = true", function (done) {
+  it("should call StripeApi.methods.createCharge with the proper parameters and return saved = true", function () {
     sandbox.stub(StripeApi.methods.createCharge, "call", function () {
       return stripeChargeResult;
     });
@@ -72,10 +72,9 @@ describe("Stripe.authorize", function () {
     let chargeResult = null;
     Stripe.authorize(cardData, { total: total, currency: currency }, function (error, result) {
       chargeResult = result;
-      expect(chargeResult).to.not.be.undefined;
-      expect(chargeResult.saved).to.be.true;
-      done();
     });
+    expect(chargeResult).to.not.be.undefined;
+    expect(chargeResult.saved).to.be.true;
   });
 });
 
@@ -90,7 +89,7 @@ describe("Stripe.authorize", function () {
     sandbox.restore();
   });
 
-  it("should properly charge a card when using a currency besides USD", function (done) {
+  it("should properly charge a card when using a currency besides USD", function () {
     const form = {
       cvv2: "345",
       expire_month: "4",
@@ -109,22 +108,22 @@ describe("Stripe.authorize", function () {
     let chargeResult = null;
     Stripe.authorize(form, { total: total, currency: currency }, function (error, result) {
       chargeResult = result;
-      expect(chargeResult).to.not.be.undefined;
-      expect(chargeResult.saved).to.be.true;
-      expect(StripeApi.methods.createCharge.call).to.have.been.calledWith({
-        chargeObj: {
-          amount: 2298,
-          currency: "EUR",
-          card: {
-            number: "4242424242424242",
-            name: "Test User",
-            cvc: "345",
-            exp_month: "4",
-            exp_year: "2019"
-          }, capture: false
-        }
-      });
-      done();
+    });
+
+    expect(chargeResult).to.not.be.undefined;
+    expect(chargeResult.saved).to.be.true;
+    expect(StripeApi.methods.createCharge.call).to.have.been.calledWith({
+      chargeObj: {
+        amount: 2298,
+        currency: "EUR",
+        card: {
+          number: "4242424242424242",
+          name: "Test User",
+          cvc: "345",
+          exp_month: "4",
+          exp_year: "2019"
+        }, capture: false
+      }
     });
   });
 });
@@ -140,7 +139,7 @@ describe("Stripe.authorize", function () {
     sandbox.restore();
   });
 
-  it("should return saved = false when card is declined", function (done) {
+  it("should return saved = false when card is declined", function () {
     const form = {
       cvv2: "345",
       expire_month: "4",
@@ -182,24 +181,23 @@ describe("Stripe.authorize", function () {
     let chargeResult = null;
     Stripe.authorize(form, { total: total, currency: currency }, function (error, result) {
       chargeResult = result;
+    });
 
-      expect(chargeResult).to.not.be.undefined;
-      expect(chargeResult.saved).to.be.false;
-      expect(chargeResult.error).to.equal("Your card was declined.");
-      expect(StripeApi.methods.createCharge.call).to.have.been.calledWith({
-        chargeObj: {
-          amount: 2298,
-          currency: "EUR",
-          card: {
-            number: "4000000000000002",
-            name: "Test User",
-            cvc: "345",
-            exp_month: "4",
-            exp_year: "2019"
-          }, capture: false
-        }
-      });
-      done();
+    expect(chargeResult).to.not.be.undefined;
+    expect(chargeResult.saved).to.be.false;
+    expect(chargeResult.error).to.equal("Your card was declined.");
+    expect(StripeApi.methods.createCharge.call).to.have.been.calledWith({
+      chargeObj: {
+        amount: 2298,
+        currency: "EUR",
+        card: {
+          number: "4000000000000002",
+          name: "Test User",
+          cvc: "345",
+          exp_month: "4",
+          exp_year: "2019"
+        }, capture: false
+      }
     });
   });
 });
@@ -215,7 +213,7 @@ describe("Stripe.authorize", function () {
     sandbox.restore();
   });
 
-  it("should return saved = false when an expired card is returned", function (done) {
+  it("should return saved = false when an expired card is returned", function () {
     // Note that this test number makes the Stripe API return this error, it is
     // not looking at the actual expiration date.
     const form = {
@@ -254,27 +252,28 @@ describe("Stripe.authorize", function () {
     sandbox.stub(StripeApi.methods.createCharge, "call", function () {
       return stripeExpiredCardResult;
     });
+    // spyOn(StripeApi.methods.createCharge, "call").and.returnValue(stripeExpiredCardResult);
 
     let chargeResult = null;
     Stripe.authorize(form, { total: total, currency: currency }, function (error, result) {
       chargeResult = result;
-      expect(chargeResult).to.not.be.undefined;
-      expect(chargeResult.saved).to.be.false;
-      expect(chargeResult.error).to.equal("Your card has expired.");
-      expect(StripeApi.methods.createCharge.call).to.have.been.calledWith({
-        chargeObj: {
-          amount: 2298,
-          currency: "USD",
-          card: {
-            number: "4000000000000069",
-            name: "Test User",
-            cvc: "345",
-            exp_month: "4",
-            exp_year: "2019"
-          }, capture: false
-        }
-      });
-      done();
+    });
+
+    expect(chargeResult).to.not.be.undefined;
+    expect(chargeResult.saved).to.be.false;
+    expect(chargeResult.error).to.equal("Your card has expired.");
+    expect(StripeApi.methods.createCharge.call).to.have.been.calledWith({
+      chargeObj: {
+        amount: 2298,
+        currency: "USD",
+        card: {
+          number: "4000000000000069",
+          name: "Test User",
+          cvc: "345",
+          exp_month: "4",
+          exp_year: "2019"
+        }, capture: false
+      }
     });
   });
 });
